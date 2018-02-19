@@ -5,7 +5,7 @@ This repo is inspired by UVa1598, a simple exchange system.
  - [] Providing an interface to exchange products
  - [] Providing a BigNum and Priority Queue Utility
  
- ##Interface
+## Interface
 The program is written in C++ for it's easy to port to other languages. The `juicyExchange.h` contains the API functions definition.
 
 To start with the exchange, create an Exchange Object.
