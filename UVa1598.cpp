@@ -30,45 +30,31 @@ struct SellCmp
 	bool operator()(const Cmd& a, const Cmd& b)
 	{
 		if(a.p > b.p) return true;
-		if(a.p == b.p) return a.id < b.id);
+		if(a.p == b.p) return a.id < b.id;
 		if(a.p < b.p) return false;
 	}
 };
 
 trade_t ask_p,ask_s,bid_p,bid_s;
 map<trade_t, bool> d;
-proirity_queue<Cmd, queue<Cmd>, BuyCmp> qbuy;
-proirity_queue<Cmd, queue<Cmd>, SellCmp> qsell;
+priority_queue<Cmd, deque<Cmd>, BuyCmp> qbuy;
+priority_queue<Cmd, deque<Cmd>, SellCmp> qsell;
 
 void clear_queue()
 {
 	while(true)
 	{
 		Cmd c = qbuy.top();
-		if(!(d.count(c.id) && c.s == 0) break;
+		if(!(d.count(c.id) && c.s == 0)) break;
 		qbuy.pop();
 		bid_s -= c.s;
 	}
 	while(true)
 	{
 		Cmd c = qsell.top();
-		if(!(d.count(c.id) && c.s == 0) break;
+		if(!(d.count(c.id) && c.s == 0)) break;
 		qsell.pop();
 		ask_s -= c.s;
-	}
-	while(true)
-	{
-		Cmd c = qsell.top();
-		if(!c.p == ask_p) break;
-		qsell.pop();
-		t.push(c);
-	}
-	while(!t.empty())
-	{
-		Cmd c = t.top();
-		t.pop();
-		bid_s += c.s;
-		qsell.push(c);
 	}
 }
 
@@ -104,10 +90,24 @@ void update_quote()
 	}
 	while(!t.empty())
 	{
-		Cmd c = t.top();
+		Cmd c = t.front();
 		t.pop();
 		ask_s += c.s;
 		qbuy.push(c);
+	}
+	while(true)
+	{
+		Cmd c = qsell.top();
+		if(!c.p == ask_p) break;
+		qsell.pop();
+		t.push(c);
+	}
+	while(!t.empty())
+	{
+		Cmd c = t.front();
+		t.pop();
+		bid_s += c.s;
+		qsell.push(c);
 	}
 }
 		   
@@ -135,10 +135,11 @@ int main()
 				cin >> c.s >> c.p;
 				while(c.p >= ask_p && c.s > 0)
 				{
+				    if(qsell.empty()) break;
 					Cmd c2 = qsell.top();
 					qsell.pop();
 					trade_t amount = min(c2.s, c.s);
-					print_trade(s,ask_p);
+					print_trade(amount,ask_p);
 					c.s -= amount;
 					c2.s -= amount;
 					if(c2.s > 0)qsell.push(c2);
@@ -152,10 +153,11 @@ int main()
 				cin >> c.s >> c.p;
 				while(c.p <= bid_p && c.s > 0)
 				{
+				    if(qbuy.empty()) break;
 					Cmd c2 = qbuy.top();
 					qbuy.pop();
 					trade_t amount = min(c2.s, c.s);
-					print_trade(s, bid_p);
+					print_trade(amount, bid_p);
 					c.s -= amount;
 					c2.s -= amount;
 					if(c2.s > 0) qbuy.push(c2);
@@ -167,4 +169,5 @@ int main()
 			print_quote();
 		}
 	}
+	return 0;
 }
