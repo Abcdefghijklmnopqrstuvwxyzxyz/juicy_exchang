@@ -44,6 +44,7 @@ void clear_queue()
 {
 	while(true)
 	{
+
 		Cmd c = qbuy.top();
 		if(!(d.count(c.id) && c.s == 0)) break;
 		qbuy.pop();
@@ -83,8 +84,14 @@ void update_quote()
 	bid_p = qsell.top().p;
 	while(true)
 	{
+		if(qbuy.empty())
+		{
+			bid_p = 0;
+			bid_s = 0;
+			break;
+		}
 		Cmd c = qbuy.top();
-		if(!c.p == ask_p) break;
+		if(!c.p == bid_p) break;
 		qbuy.pop();
 		t.push(c);
 	}
@@ -92,11 +99,17 @@ void update_quote()
 	{
 		Cmd c = t.front();
 		t.pop();
-		ask_s += c.s;
+		bid_s += c.s;
 		qbuy.push(c);
 	}
 	while(true)
 	{
+		if(qsell.empty())
+		{
+			ask_p = 99999;
+			ask_s = 0;
+			break;
+		}
 		Cmd c = qsell.top();
 		if(!c.p == ask_p) break;
 		qsell.pop();
@@ -106,7 +119,7 @@ void update_quote()
 	{
 		Cmd c = t.front();
 		t.pop();
-		bid_s += c.s;
+		ask_s += c.s;
 		qsell.push(c);
 	}
 }
